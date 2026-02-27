@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honey - Button Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #2c2c2c;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .test-section h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        button {
+            padding: 12px 24px;
+            margin: 5px 5px 5px 0;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-test {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-test:hover {
+            background: #0056b3;
+        }
+
+        .output {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border-left: 4px solid #007bff;
+            font-family: monospace;
+            font-size: 0.9rem;
+            min-height: 40px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .reminder-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .reminder-modal.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-content {
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .modal-message {
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🍯 Honey - Button Interaction Test</h1>
+
+        <div class="test-section">
+            <h2>Test 1: Show Modal</h2>
+            <button class="btn-test" onclick="showModal()">Click to Show Modal</button>
+            <div class="output" id="output1">Ready...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Button Clicks</h2>
+            <p>After showing modal above, try clicking the buttons:</p>
+            <ul>
+                <li>✓ "Mark Complete" should show green success</li>
+                <li>✓ "Dismiss" should close modal</li>
+                <li>✓ Click overlay should close modal</li>
+                <li>✓ Press ESC key should close modal</li>
+            </ul>
+            <div class="output" id="output2">Waiting for action...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Manual Button Test</h2>
+            <button class="btn-primary" onclick="testComplete()">Test Mark Complete</button>
+            <button class="btn-secondary" onclick="testDismiss()">Test Dismiss</button>
+            <div class="output" id="output3">Not clicked yet</div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="overlay" id="overlay" onclick="if(event.target === this) dismissModal()"></div>
+    <div class="reminder-modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-icon">🔔</div>
+            <div class="modal-title">Task Reminder</div>
+            <div class="modal-message">Your task: Test Task is ready!</div>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="completeBtn" onclick="completeTask()">Mark Complete</button>
+                <button class="btn-secondary" id="dismissBtn" onclick="dismissModal()">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let eventLog = [];
+
+        function log(message, elementId) {
+            eventLog.push(message);
+            if (elementId) {
+                document.getElementById(elementId).textContent = message;
+                document.getElementById(elementId).innerHTML += `<div class="success">✓ ${message}</div>`;
+            }
+            console.log(message);
+        }
+
+        function showModal() {
+            log('Modal opened', 'output1');
+            document.getElementById('modal').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('output2').innerHTML = 'Modal is now open. Try the buttons below:';
+        }
+
+        function completeTask() {
+            log('✓ Mark Complete clicked!', 'output2');
+            dismissModal();
+        }
+
+        function dismissModal() {
+            log('✓ Modal dismissed', 'output2');
+            document.getElementById('modal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        function testComplete() {
+            log('Test Complete button works!', 'output3');
+        }
+
+        function testDismiss() {
+            log('Test Dismiss button works!', 'output3');
+        }
+
+        // ESC key support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('modal').classList.contains('show')) {
+                log('✓ ESC key pressed - Modal closed', 'output2');
+                dismissModal();
+            }
+        });
+
+        // Add click handlers with logging
+        document.getElementById('completeBtn').addEventListener('click', function(e) {
+            console.log('Complete button clicked (addEventListener)');
+            log('✓ addEventListener: Complete button registered', 'output2');
+        });
+
+        document.getElementById('dismissBtn').addEventListener('click', function(e) {
+            console.log('Dismiss button clicked (addEventListener)');
+            log('✓ addEventListener: Dismiss button registered', 'output2');
+        });
+
+        console.log('Test page loaded. Buttons are ready to test.');
+    </script>
+</body>
+</html>

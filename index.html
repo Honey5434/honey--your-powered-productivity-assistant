@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honey - AI Personal Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --honey-gold: #F4D35E;
+            --honey-light: #FFF9E6;
+            --honey-dark: #D4A574;
+            --white: #FFFFFF;
+            --light-beige: #F7F5F0;
+            --gray-light: #E8E8E8;
+            --gray-dark: #7A7A7A;
+            --text-primary: #2C2C2C;
+            --text-secondary: #666666;
+            --success: #4CAF50;
+            --meeting: #7C3AED;
+            --work: #3B82F6;
+            --study: #EC4899;
+            --personal: #10B981;
+        }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #F7F5F0 0%, #FFF9E6 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Clock Section */
+        .clock-section {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clock-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--honey-gold) 0%, transparent 70%);
+            opacity: 0.1;
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .analog-clock {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 8px solid var(--honey-gold);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFFDF7 0%, #FFF9E6 100%);
+            margin: 20px 0;
+            box-shadow: 0 10px 40px rgba(244, 211, 94, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: var(--honey-gold);
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(244, 211, 94, 0.5);
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            background: var(--text-primary);
+            border-radius: 10px;
+        }
+
+        .hour-hand {
+            width: 6px;
+            height: 60px;
+            margin-left: -3px;
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 80px;
+            margin-left: -2px;
+            background: var(--honey-dark);
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 90px;
+            margin-left: -1px;
+            background: #E74C3C;
+        }
+
+        .clock-number {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .clock-number span {
+            display: inline-block;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+        }
+
+        .digital-time {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        .date-display {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Task Scheduler */
+        .scheduler-section {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 28px;
+            background: var(--honey-gold);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-light);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--honey-gold);
+            box-shadow: 0 0 0 3px rgba(244, 211, 94, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .type-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .type-option {
+            padding: 12px;
+            border: 2px solid var(--gray-light);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-secondary);
+        }
+
+        .type-option:hover {
+            border-color: var(--honey-gold);
+            background: var(--honey-light);
+        }
+
+        .type-option.selected {
+            border-color: var(--honey-gold);
+            background: var(--honey-gold);
+            color: var(--text-primary);
+        }
+
+        .type-option.work.selected {
+            background: var(--work);
+            color: white;
+            border-color: var(--work);
+        }
+
+        .type-option.study.selected {
+            background: var(--study);
+            color: white;
+            border-color: var(--study);
+        }
+
+        .type-option.meeting.selected {
+            background: var(--meeting);
+            color: white;
+            border-color: var(--meeting);
+        }
+
+        .type-option.personal.selected {
+            background: var(--personal);
+            color: white;
+            border-color: var(--personal);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--honey-gold) 0%, var(--honey-dark) 100%);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(244, 211, 94, 0.3);
+            margin-top: 15px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 211, 94, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Tasks Grid */
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .tasks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tasks-container {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .container-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 24px;
+            background: var(--honey-gold);
+            border-radius: 1px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .task-item {
+            background: linear-gradient(135deg, #F7F5F0 0%, #FFF9E6 100%);
+            border-left: 4px solid var(--honey-gold);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.work {
+            border-left-color: var(--work);
+        }
+
+        .task-item.study {
+            border-left-color: var(--study);
+        }
+
+        .task-item.meeting {
+            border-left-color: var(--meeting);
+        }
+
+        .task-item.personal {
+            border-left-color: var(--personal);
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            background: linear-gradient(135deg, #F0F0F0 0%, #F5F5F5 100%);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .task-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .task-item.completed .task-name {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .task-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--honey-light);
+            color: var(--text-primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-item.work .task-type {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--work);
+        }
+
+        .task-item.study .task-type {
+            background: rgba(236, 72, 153, 0.1);
+            color: var(--study);
+        }
+
+        .task-item.meeting .task-type {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--meeting);
+        }
+
+        .task-item.personal .task-type {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--personal);
+        }
+
+        .task-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-status {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-light);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            margin-left: 10px;
+        }
+
+        .task-status:hover {
+            border-color: var(--honey-gold);
+        }
+
+        .task-item.completed .task-status {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-status::after {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg) translate(-2px, -3px);
+            opacity: 0;
+        }
+
+        .task-item.completed .task-status::after {
+            opacity: 1;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .task-delete {
+            padding: 6px 12px;
+            background: rgba(231, 76, 60, 0.1);
+            color: #E74C3C;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .task-delete:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        /* Reminder Popup */
+        .reminder-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .reminder-popup.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .reminder-popup.meeting {
+            background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+            color: white;
+        }
+
+        .reminder-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .reminder-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: bounce 0.6s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .reminder-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .reminder-task {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .reminder-time {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .reminder-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.2);
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .reminder-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            width: 100%;
+            pointer-events: auto;
+        }
+
+        .reminder-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .reminder-btn:active {
+            transform: scale(0.98);
+        }
+
+        .reminder-btn-primary {
+            background: var(--success);
+            color: white;
+        }
+
+        .reminder-btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .reminder-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .reminder-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .reminder-popup.meeting .reminder-btn-primary {
+            background: white;
+            color: var(--meeting);
+        }
+
+        .reminder-popup.meeting .reminder-btn-primary:hover {
+            background: #f5f5f5;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+            visibility: hidden;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.2;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .main-layout {
+                gap: 20px;
+            }
+
+            .scheduler-section,
+            .clock-section {
+                padding: 30px 20px;
+            }
+
+            .type-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .reminder-popup {
+                max-width: calc(100% - 40px);
+            }
+        }
+
+        /* Success animation */
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .task-item.delete-animation {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+            animation: slideInRight 0.3s ease-out forwards;
+            z-index: 1001;
+            font-weight: 500;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🍯 Honey</h1>
+            <p>Your intelligent personal assistant</p>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Clock Section -->
+            <div class="clock-section">
+                <div class="analog-clock">
+                    <div class="clock-center"></div>
+                    <div class="hand hour-hand" id="hourHand"></div>
+                    <div class="hand minute-hand" id="minuteHand"></div>
+                    <div class="hand second-hand" id="secondHand"></div>
+                    <div class="clock-number" id="clockNumbers"></div>
+                </div>
+                <div class="digital-time" id="digitalTime">00:00</div>
+                <div class="date-display" id="dateDisplay">Loading...</div>
+            </div>
+
+            <!-- Task Scheduler -->
+            <div class="scheduler-section">
+                <h2 class="section-title">Add New Task</h2>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskName">Task Name</label>
+                        <input type="text" id="taskName" placeholder="Enter task name..." required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskDate">Date</label>
+                            <input type="date" id="taskDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime">Time</label>
+                            <input type="time" id="taskTime" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Task Type</label>
+                        <div class="type-selector">
+                            <div class="type-option work" data-type="Work">💼 Work</div>
+                            <div class="type-option study" data-type="Study">📚 Study</div>
+                            <div class="type-option meeting" data-type="Meeting">👥 Meeting</div>
+                            <div class="type-option personal" data-type="Personal">✨ Personal</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Create Task</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tasks Grid -->
+        <div class="tasks-grid">
+            <!-- Today's Tasks -->
+            <div class="tasks-container">
+                <h3 class="container-title">Today's Tasks</h3>
+                <div id="todayTasks" class="tasks-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>No tasks for today</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Tasks -->
+            <div class="tasks-container">
+                <h3 class="container-title">Upcoming Tasks</h3>
+                <div id="upcomingTasks" class="tasks-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🚀</div>
+                        <p>No upcoming tasks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Popup -->
+    <div class="overlay" id="overlay"></div>
+    <div class="reminder-popup" id="reminderPopup">
+        <div class="reminder-content">
+            <div class="reminder-icon" id="reminderIcon">🔔</div>
+            <div class="reminder-type-badge" id="reminderBadge">Task</div>
+            <div class="reminder-title" id="reminderTitle">Task Reminder</div>
+            <div class="reminder-task" id="reminderTask">Your task is starting now</div>
+            <div class="reminder-time" id="reminderTime">Now</div>
+            <div class="reminder-actions">
+                <button type="button" class="reminder-btn reminder-btn-primary" id="markCompleteBtn">Mark Complete</button>
+                <button type="button" class="reminder-btn reminder-btn-secondary" id="dismissBtn">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== HONEY APP ====================
+        
+        class HoneyAssistant {
+            constructor() {
+                this.tasks = this.loadTasks();
+                this.selectedType = 'Work';
+                this.currentReminder = null;
+                this.reminderCheckInterval = null;
+                this.init();
+            }
+
+            init() {
+                this.setupClock();
+                this.setupEventListeners();
+                this.renderTasks();
+                this.startReminderCheck();
+                this.setDefaultDate();
+            }
+
+            // ==================== CLOCK ====================
+            setupClock() {
+                this.updateClock();
+                setInterval(() => this.updateClock(), 1000);
+            }
+
+            updateClock() {
+                const now = new Date();
+                
+                // Analog clock
+                const seconds = now.getSeconds();
+                const minutes = now.getMinutes();
+                const hours = now.getHours() % 12;
+
+                const secondDegree = (seconds / 60) * 360 + 90;
+                const minuteDegree = (minutes / 60) * 360 + (seconds / 60) * 6 + 90;
+                const hourDegree = (hours / 12) * 360 + (minutes / 60) * 30 + 90;
+
+                document.getElementById('secondHand').style.transform = `rotate(${secondDegree}deg)`;
+                document.getElementById('minuteHand').style.transform = `rotate(${minuteDegree}deg)`;
+                document.getElementById('hourHand').style.transform = `rotate(${hourDegree}deg)`;
+
+                // Digital time
+                const hours24 = String(now.getHours()).padStart(2, '0');
+                const minutes24 = String(now.getMinutes()).padStart(2, '0');
+                document.getElementById('digitalTime').textContent = `${hours24}:${minutes24}`;
+
+                // Date
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateString = now.toLocaleDateString('en-US', dateOptions);
+                document.getElementById('dateDisplay').textContent = dateString;
+
+                // Add clock numbers if not already done
+                if (!document.getElementById('clockNumbers').children.length) {
+                    this.drawClockNumbers();
+                }
+            }
+
+            drawClockNumbers() {
+                const container = document.getElementById('clockNumbers');
+                for (let i = 1; i <= 12; i++) {
+                    const angle = (i - 3) * 30 * Math.PI / 180;
+                    const x = 85 * Math.cos(angle);
+                    const y = 85 * Math.sin(angle);
+                    
+                    const span = document.createElement('span');
+                    span.textContent = i;
+                    span.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                    container.appendChild(span);
+                }
+            }
+
+            setDefaultDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('taskDate').value = today;
+            }
+
+            // ==================== EVENT LISTENERS ====================
+            setupEventListeners() {
+                // Form submission
+                const taskForm = document.getElementById('taskForm');
+                if (taskForm) {
+                    taskForm.addEventListener('submit', (e) => this.handleAddTask(e));
+                }
+
+                // Type selector
+                document.querySelectorAll('.type-option').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.selectType(e.target));
+                });
+
+                // Reminder buttons - Direct binding to this context
+                const self = this;
+                const markCompleteBtn = document.getElementById('markCompleteBtn');
+                const dismissBtn = document.getElementById('dismissBtn');
+                const overlay = document.getElementById('overlay');
+
+                if (markCompleteBtn) {
+                    markCompleteBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        self.handleCompleteReminder();
+                    });
+                }
+
+                if (dismissBtn) {
+                    dismissBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        self.handleDismissReminder();
+                    });
+                }
+
+                if (overlay) {
+                    overlay.addEventListener('click', function(e) {
+                        if (e.target === overlay) {
+                            self.handleDismissReminder();
+                        }
+                    });
+                }
+
+                // Keyboard support - ESC key to close reminder
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.currentReminder !== null) {
+                        this.handleDismissReminder();
+                    }
+                });
+            }
+
+            selectType(element) {
+                document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+                this.selectedType = element.getAttribute('data-type');
+            }
+
+            handleAddTask(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('taskName').value.trim();
+                const date = document.getElementById('taskDate').value;
+                const time = document.getElementById('taskTime').value;
+                const type = this.selectedType;
+
+                if (!name || !date || !time) {
+                    this.showToast('Please fill in all fields');
+                    return;
+                }
+
+                const task = {
+                    id: Date.now(),
+                    name,
+                    date,
+                    time,
+                    type,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                this.tasks.push(task);
+                this.saveTasks();
+                this.renderTasks();
+                
+                // Reset form
+                document.getElementById('taskForm').reset();
+                this.selectedType = 'Work';
+                document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+                document.querySelector('.type-option.work').classList.add('selected');
+
+                this.showToast('Task created successfully!');
+            }
+
+            // ==================== TASK MANAGEMENT ====================
+            renderTasks() {
+                const today = new Date().toISOString().split('T')[0];
+                const todayTasks = this.tasks.filter(t => t.date === today);
+                const upcomingTasks = this.tasks.filter(t => new Date(t.date) > new Date(today));
+
+                this.renderTaskList('todayTasks', todayTasks, 'Today\'s Tasks');
+                this.renderTaskList('upcomingTasks', upcomingTasks, 'Upcoming Tasks');
+            }
+
+            renderTaskList(containerId, tasks, emptyMessage) {
+                const container = document.getElementById(containerId);
+                
+                if (tasks.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">${containerId.includes('today') ? '📅' : '🚀'}</div>
+                            <p>${emptyMessage} is empty</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = tasks.map(task => `
+                    <div class="task-item ${task.type.toLowerCase()} ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                        <div class="task-header">
+                            <div style="flex: 1;">
+                                <div class="task-name">${this.escapeHtml(task.name)}</div>
+                                <div class="task-time">⏰ ${task.time}</div>
+                            </div>
+                            <span class="task-type">${task.type}</span>
+                            <div class="task-status" onclick="app.toggleTaskStatus(${task.id})"></div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="task-delete" onclick="app.deleteTask(${task.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            toggleTaskStatus(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.completed = !task.completed;
+                    this.saveTasks();
+                    this.renderTasks();
+                }
+            }
+
+            deleteTask(taskId) {
+                this.tasks = this.tasks.filter(t => t.id !== taskId);
+                this.saveTasks();
+                this.renderTasks();
+                this.showToast('Task deleted');
+            }
+
+            // ==================== REMINDERS ====================
+            startReminderCheck() {
+                this.checkReminders();
+                this.reminderCheckInterval = setInterval(() => this.checkReminders(), 30000);
+            }
+
+            checkReminders() {
+                // Don't show new reminders if one is already displayed
+                if (this.currentReminder !== null) {
+                    return;
+                }
+
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                for (let task of this.tasks) {
+                    if (task.date === today && !task.completed && task.time === currentTime) {
+                        this.showReminder(task);
+                        break;
+                    }
+                }
+            }
+
+            showReminder(task) {
+                this.currentReminder = task;
+
+                const popup = document.getElementById('reminderPopup');
+                const overlay = document.getElementById('overlay');
+
+                if (!popup || !overlay) {
+                    console.error('Reminder popup or overlay element not found');
+                    return;
+                }
+                
+                // Update popup content
+                const reminderIcon = document.getElementById('reminderIcon');
+                const reminderBadge = document.getElementById('reminderBadge');
+                const reminderTitle = document.getElementById('reminderTitle');
+                const reminderTask = document.getElementById('reminderTask');
+                const reminderTime = document.getElementById('reminderTime');
+
+                if (reminderIcon) reminderIcon.textContent = this.getTaskIcon(task.type);
+                if (reminderBadge) reminderBadge.textContent = task.type.toUpperCase();
+                if (reminderTitle) reminderTitle.textContent = task.type === 'Meeting' ? 'Meeting Reminder' : 'Task Reminder';
+                if (reminderTask) reminderTask.textContent = task.name;
+                if (reminderTime) reminderTime.textContent = `at ${task.time}`;
+
+                // Update styling for meetings
+                if (task.type === 'Meeting') {
+                    popup.classList.add('meeting');
+                } else {
+                    popup.classList.remove('meeting');
+                }
+
+                // Add show class to display popup
+                popup.classList.add('show');
+                overlay.classList.add('show');
+
+                // Play sound
+                this.playAlertSound();
+
+                // Voice alert
+                this.playVoiceAlert(task);
+            }
+
+            getTaskIcon(type) {
+                const icons = {
+                    'Work': '💼',
+                    'Study': '📚',
+                    'Meeting': '👥',
+                    'Personal': '✨'
+                };
+                return icons[type] || '🔔';
+            }
+
+            playAlertSound() {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 800;
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+
+            playVoiceAlert(task) {
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+
+                    const utterance = new SpeechSynthesisUtterance();
+                    
+                    if (task.type === 'Meeting') {
+                        utterance.text = "Hi, your meeting is starting now. Please join on time.";
+                    } else {
+                        utterance.text = `Hello, this is Honey. It's time to complete your task: ${task.name}`;
+                    }
+
+                    utterance.rate = 0.95;
+                    utterance.pitch = 1;
+                    utterance.volume = 0.8;
+
+                    speechSynthesis.speak(utterance);
+                }
+            }
+
+            handleCompleteReminder() {
+                if (this.currentReminder) {
+                    this.toggleTaskStatus(this.currentReminder.id);
+                    this.handleDismissReminder();
+                    this.showToast('Great job! Task marked as complete');
+                }
+            }
+
+            handleDismissReminder() {
+                const popup = document.getElementById('reminderPopup');
+                const overlay = document.getElementById('overlay');
+
+                if (popup) {
+                    popup.classList.remove('show');
+                }
+                if (overlay) {
+                    overlay.classList.remove('show');
+                }
+                
+                // Clear current reminder to prevent duplicate alerts
+                this.currentReminder = null;
+                
+                // Stop any ongoing speech synthesis
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                }
+            }
+
+            // ==================== STORAGE ====================
+            loadTasks() {
+                const stored = localStorage.getItem('honeyTasks');
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            saveTasks() {
+                localStorage.setItem('honeyTasks', JSON.stringify(this.tasks));
+            }
+
+            // ==================== UTILITIES ====================
+            showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.style.animation = 'slideOut 0.3s ease-out forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }, 2500);
+            }
+
+            escapeHtml(text) {
+                const map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, m => map[m]);
+            }
+        }
+
+        // Initialize app
+        const app = new HoneyAssistant();
+    </script>
+</body>
+</html>

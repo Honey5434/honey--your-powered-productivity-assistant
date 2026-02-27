@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+*.npm
+*.yarn
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build
+dist/
+build/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Documentation (optional - remove if you want to commit these)
+# *.md
+
+# Tests
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+temp/
+tmp/
